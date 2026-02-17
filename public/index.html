@@ -36,6 +36,8 @@
 :root{
   /* Backgrounds */
   --bg-base:#ffffff;--bg-surface:#f4f6f8;--bg-elevated:#ffffff;
+  /* Mobile sheet */
+  --sheet-peek:260px;
   /* Text */
   --text-primary:#1a1a2e;--text-secondary:#5a6578;--text-muted:#94a3b8;
   /* Accents */
@@ -180,7 +182,7 @@ input:focus::placeholder{opacity:.4}
     border-right:none;border-top:1px solid var(--border);
     border-radius:var(--radius-lg) var(--radius-lg) 0 0;
     background:var(--bg-base);
-    transform:translateY(calc(100% - 60px));
+    transform:translateY(calc(100% - var(--sheet-peek)));
     transition:transform var(--duration-slow) var(--ease-out);
     overscroll-behavior:contain;
     box-shadow:0 -4px 24px rgba(0,0,0,.1);
@@ -197,17 +199,8 @@ input:focus::placeholder{opacity:.4}
     content:'';display:block;width:40px;height:4px;
     background:var(--text-muted);border-radius:2px;opacity:.4;
   }
-  .sheet-toggle{
-    position:fixed;bottom:76px;right:var(--sp-4);z-index:9;
-    width:52px;height:52px;border-radius:50%;border:none;
-    background:linear-gradient(135deg,#16a34a,#22c55e);
-    color:#fff;cursor:pointer;
-    box-shadow:var(--shadow-lg);
-    display:flex;align-items:center;justify-content:center;
-    transition:all var(--duration-normal) var(--ease-out);
-  }
-  .sheet-toggle:active{transform:scale(.92)}
-  .sheet-toggle.hidden{opacity:0;pointer-events:none;transform:scale(.5)}
+  .sheet-chevron{color:var(--text-muted);transition:transform .25s var(--ease-out)}
+  .sheet-open .sheet-chevron{transform:rotate(180deg)}
   h1{font-size:20px}
   .result-value{font-size:24px}
   .leaflet-control-zoom a{width:36px !important;height:36px !important;line-height:36px !important;font-size:18px !important}
@@ -215,7 +208,6 @@ input:focus::placeholder{opacity:.4}
 }
 @media(min-width:901px){
   .sheet-handle{display:none}
-  .sheet-toggle{display:none}
 }
 </style>
 <script type="application/ld+json">
@@ -244,7 +236,9 @@ input:focus::placeholder{opacity:.4}
 <noscript><p style="padding:2rem;text-align:center;color:#1a1a2e;background:#f4f6f8">See rakendus vajab JavaScripti. Palun luba JavaScript oma brauseris.</p></noscript>
 <main class="layout">
   <aside class="sidebar" id="sidebar">
-    <div class="sheet-handle" id="sheetHandle"></div>
+    <div class="sheet-handle" id="sheetHandle">
+      <svg class="sheet-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </div>
     <header>
       <p class="logo">PRIA × Keskkonnaamet</p>
       <h1>Veekaitsevööndi kalkulaator</h1>
@@ -298,11 +292,6 @@ input:focus::placeholder{opacity:.4}
   </div>
 </main>
 
-<!-- Mobile sheet toggle FAB -->
-<button class="sheet-toggle" id="sheetToggle" aria-label="Ava paneel">
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
-
 <script>
 proj4.defs('EPSG:3301','+proj=lcc +lat_1=59.33333333333334 +lat_2=58 +lat_0=57.51755393055556 +lon_0=24 +x_0=500000 +y_0=6375000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
 
@@ -330,41 +319,45 @@ function setStatus(m,t='info'){
 
 /* ───── Mobile bottom sheet logic ───── */
 const sidebar=document.getElementById('sidebar');
-const sheetToggle=document.getElementById('sheetToggle');
 const sheetHandle=document.getElementById('sheetHandle');
 
 function isMobile(){return window.innerWidth<=900}
 
 function openSheet(){
   sidebar.classList.add('sheet-open');
-  sheetToggle.classList.add('hidden');
 }
 function closeSheet(){
   sidebar.classList.remove('sheet-open');
-  sheetToggle.classList.remove('hidden');
 }
 function toggleSheet(){
   if(sidebar.classList.contains('sheet-open'))closeSheet();
   else openSheet();
 }
 
-sheetToggle.addEventListener('click',toggleSheet);
 sheetHandle.addEventListener('click',toggleSheet);
 
+/* Auto-open sheet when inputs are focused on mobile */
+document.querySelectorAll('#searchForm input').forEach(input=>{
+  input.addEventListener('focus',()=>{
+    if(isMobile()&&!sidebar.classList.contains('sheet-open'))openSheet();
+  });
+});
+
 /* Touch drag for sheet handle */
-let sheetStartY=0,sheetStartTransform=0,sheetDragging=false;
+let sheetStartY=0,sheetStartTransform=0,sheetDragging=false,sheetPeek=260;
 sheetHandle.addEventListener('touchstart',e=>{
   if(!isMobile())return;
   sheetDragging=true;
   sheetStartY=e.touches[0].clientY;
+  sheetPeek=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sheet-peek'))||260;
   sidebar.style.transition='none';
 },{passive:true});
 document.addEventListener('touchmove',e=>{
   if(!sheetDragging)return;
   const dy=e.touches[0].clientY-sheetStartY;
   const isOpen=sidebar.classList.contains('sheet-open');
-  const base=isOpen?0:sidebar.offsetHeight-60;
-  const y=Math.max(0,Math.min(sidebar.offsetHeight-60,base+dy));
+  const base=isOpen?0:sidebar.offsetHeight-sheetPeek;
+  const y=Math.max(0,Math.min(sidebar.offsetHeight-sheetPeek,base+dy));
   sidebar.style.transform=`translateY(${y}px)`;
 },{passive:true});
 document.addEventListener('touchend',()=>{
