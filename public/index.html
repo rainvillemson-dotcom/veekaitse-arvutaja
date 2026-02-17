@@ -3,7 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Veekaitsevööndi kalkulaator</title>
+<title>Veekaitsevööndi kalkulaator | Põllumassiivi ja veekaitsevööndi kattuvuse arvutaja</title>
+<meta name="description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. Kasuta PRIA registri andmeid ja Keskkonnaameti veekaitsevööndeid, et leida piirangualad ja puhvertsoonid.">
+<meta name="keywords" content="veekaitsevöönd, kalkulaator, põllumassiiv, PRIA, Keskkonnaamet, veekaitsevööndi arvutaja, põllumajandus, veekaitse, puhverala, kattuvus, Eesti, maaregister">
+<meta name="author" content="Rain Villemson">
+<meta name="theme-color" content="#141f1a">
+<link rel="canonical" href="https://veekaitse-arvutaja.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Veekaitsevööndi kalkulaator">
+<meta property="og:description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. PRIA ja Keskkonnaameti andmed.">
+<meta property="og:url" content="https://veekaitse-arvutaja.vercel.app/">
+<meta property="og:locale" content="et_EE">
+<meta property="og:site_name" content="Veekaitsevööndi kalkulaator">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Veekaitsevööndi kalkulaator">
+<meta name="twitter:description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
@@ -85,7 +99,7 @@ input:focus::placeholder{opacity:.4}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ───── Divider ───── */
-.divider{height:1px;background:var(--border);margin:var(--sp-6) 0}
+.divider{height:1px;background:var(--border);margin:var(--sp-6) 0;border:none}
 
 /* ───── Results ───── */
 .results{animation:fadeIn var(--duration-slow) var(--ease-out)}
@@ -118,11 +132,12 @@ input:focus::placeholder{opacity:.4}
 
 /* ───── Legend ───── */
 .legend{margin-top:var(--sp-6)}
+.legend-title{display:block;font-size:11px;font-weight:500;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:var(--sp-2);font-family:'Space Mono',monospace}
 .legend-item{display:flex;align-items:center;gap:var(--sp-3);margin-bottom:var(--sp-2);font-size:13px;color:var(--text-secondary)}
 .legend-swatch{width:20px;height:14px;border-radius:3px;border:2px solid;flex-shrink:0}
 
 /* ───── Water Details ───── */
-.water-details{margin-top:var(--sp-3)}
+.water-details{margin-top:var(--sp-3);list-style:none}
 .water-row{display:flex;align-items:center;padding:var(--sp-2) var(--sp-2);border-bottom:1px solid rgba(42,74,42,.5);font-size:13px;border-radius:var(--radius-sm);margin:0 calc(-1 * var(--sp-2));transition:background var(--duration-fast) var(--ease-out);cursor:default}
 .water-row:hover{background:rgba(58,123,213,.08)}
 .water-row:last-child{border-bottom:none}
@@ -195,14 +210,38 @@ input:focus::placeholder{opacity:.4}
   .sheet-toggle{display:none}
 }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Veekaitsevööndi kalkulaator",
+  "description": "Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. Kasuta PRIA registri andmeid ja Keskkonnaameti veekaitsevööndeid.",
+  "url": "https://veekaitse-arvutaja.vercel.app/",
+  "inLanguage": "et",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "EUR"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Rain Villemson"
+  }
+}
+</script>
 </head>
 <body>
-<div class="layout">
-  <div class="sidebar" id="sidebar">
+<noscript><p style="padding:2rem;text-align:center;color:#e8f5e8;background:#141f1a">See rakendus vajab JavaScripti. Palun luba JavaScript oma brauseris.</p></noscript>
+<main class="layout">
+  <aside class="sidebar" id="sidebar">
     <div class="sheet-handle" id="sheetHandle"></div>
-    <div class="logo">PRIA × Keskkonnaamet</div>
-    <h1>Veekaitsevööndi kalkulaator</h1>
-    <p class="subtitle">Leia põllumassiivi ja veekaitsevööndite kattuvus ning arvuta puhverala pindala.</p>
+    <header>
+      <p class="logo">PRIA × Keskkonnaamet</p>
+      <h1>Veekaitsevööndi kalkulaator</h1>
+      <p class="subtitle">Leia põllumassiivi ja veekaitsevööndite kattuvus ning arvuta puhverala pindala.</p>
+    </header>
 
     <form id="searchForm" onsubmit="event.preventDefault();search()">
       <div class="input-group">
@@ -235,21 +274,21 @@ input:focus::placeholder{opacity:.4}
     <div id="statusArea" role="status" aria-live="polite" style="margin-top:var(--sp-4)"></div>
     <div id="resultsArea"></div>
 
-    <div class="legend" id="legendArea" style="display:none">
-      <div class="divider"></div>
-      <label>Selgitus</label>
-      <div class="legend-item"><div class="legend-swatch" style="background:rgba(92,184,92,.3);border-color:#5cb85c"></div>Põllumassiiv</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:rgba(58,123,213,.25);border-color:#3a7bd5"></div>Veekaitsevöönd</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:rgba(240,173,78,.3);border-color:#f0ad4e"></div>Puhverala (veekaitsevöönd + puhver)</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:rgba(217,83,79,.4);border-color:#d9534f"></div>Vähendatav ala</div>
-    </div>
-  </div>
+    <section class="legend" id="legendArea" aria-label="Kaardi selgitus" style="display:none">
+      <hr class="divider">
+      <h2 class="legend-title">Selgitus</h2>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(92,184,92,.3);border-color:#5cb85c"></span>Põllumassiiv</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(58,123,213,.25);border-color:#3a7bd5"></span>Veekaitsevöönd</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(240,173,78,.3);border-color:#f0ad4e"></span>Puhverala (veekaitsevöönd + puhver)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(217,83,79,.4);border-color:#d9534f"></span>Vähendatav ala</div>
+    </section>
+  </aside>
   <div id="map"></div>
   <div id="mapEmptyState" style="position:fixed;top:50%;left:calc(420px + (100% - 420px)/2);transform:translate(-50%,-50%);z-index:5;pointer-events:none;text-align:center;opacity:.5">
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);margin-bottom:8px"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     <p style="font-size:14px;color:var(--text-muted);font-family:'DM Sans',sans-serif">Sisesta põllumassiivi number<br>ja vajuta "Otsi ja arvuta"</p>
   </div>
-</div>
+</main>
 
 <!-- Mobile sheet toggle FAB -->
 <button class="sheet-toggle" id="sheetToggle" aria-label="Ava paneel">
@@ -493,33 +532,33 @@ function showResults(field,props,waterZones,overlapArea,bufferDist){
   const fa=calcArea(field),fh=fmtNum(fa/10000),oh=fmtNum(overlapArea/10000);
   const eh=fmtNum((fa-overlapArea)/10000),op=fa>0?((overlapArea/fa)*100).toFixed(1).replace('.',','):0;
 
-  let h='<div class="divider"></div><div class="results">';
+  let h='<hr class="divider"><section class="results" aria-label="Tulemused">';
 
   // Põllumassiiv card
-  h+=`<div class="result-card"><div class="result-header">${cardIcons.field}<h3>Põllumassiiv</h3></div><div class="result-value">${props.xy_id||'N/A'}</div><div class="result-sub">${[props.maakond,props.vald].filter(Boolean).join(', ')}</div></div>`;
+  h+=`<article class="result-card"><header class="result-header">${cardIcons.field}<h3>Põllumassiiv</h3></header><p class="result-value">${props.xy_id||'N/A'}</p><p class="result-sub">${[props.maakond,props.vald].filter(Boolean).join(', ')}</p></article>`;
 
   // Pindala card
-  h+=`<div class="result-card"><div class="result-header">${cardIcons.area}<h3>Massiivi pindala</h3></div><div class="result-value">${fh}<span class="unit">ha</span></div><div class="result-sub">${fmtInt(fa)} m²</div></div>`;
+  h+=`<article class="result-card"><header class="result-header">${cardIcons.area}<h3>Massiivi pindala</h3></header><p class="result-value">${fh}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(fa)} m²</p></article>`;
 
   // Vähendatav ala card
-  h+=`<div class="result-card ${overlapArea>0?'result-highlight':''}"><div class="result-header">${cardIcons.danger}<h3>Vähendatav ala ${bufferDist>0?`(+${bufferDist}m puhver)`:'(ilma puhvrita)'}</h3></div><div class="result-value">${oh}<span class="unit">ha</span></div><div class="result-sub">${fmtInt(overlapArea)} m² · <span class="result-badge ${overlapArea>0?'result-badge-danger':'result-badge-success'}">${op}%</span> massiivi pindalast</div></div>`;
+  h+=`<article class="result-card ${overlapArea>0?'result-highlight':''}"><header class="result-header">${cardIcons.danger}<h3>Vähendatav ala ${bufferDist>0?`(+${bufferDist}m puhver)`:'(ilma puhvrita)'}</h3></header><p class="result-value">${oh}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(overlapArea)} m² · <span class="result-badge ${overlapArea>0?'result-badge-danger':'result-badge-success'}">${op}%</span> massiivi pindalast</p></article>`;
 
   // Kasutatav pindala card
   if(overlapArea>0){
-    h+=`<div class="result-card result-positive"><div class="result-header">${cardIcons.usable}<h3>Kasutatav pindala</h3></div><div class="result-value">${eh}<span class="unit">ha</span></div><div class="result-sub">Massiivi pindala miinus vähendatav ala</div></div>`;
+    h+=`<article class="result-card result-positive"><header class="result-header">${cardIcons.usable}<h3>Kasutatav pindala</h3></header><p class="result-value">${eh}<span class="unit">ha</span></p><p class="result-sub">Massiivi pindala miinus vähendatav ala</p></article>`;
   }
 
   // Veekaitsevööndid card
   if(waterZones.length){
-    h+=`<div class="result-card"><div class="result-header">${cardIcons.water}<h3>Leitud veekaitsevööndid</h3><span class="result-badge result-badge-success">${waterZones.length}</span></div><div class="water-details">`;
+    h+=`<article class="result-card"><header class="result-header">${cardIcons.water}<h3>Leitud veekaitsevööndid</h3><span class="result-badge result-badge-success">${waterZones.length}</span></header><ul class="water-details">`;
     waterZones.forEach((w,i)=>{
       const name=w.properties.objekti_nimetus||w.properties.voondi_nimetus||w.properties.nimi||'Nimeta';
-      h+=`<div class="water-row"><span class="water-badge">${i+1}</span><span class="water-name">${name}</span></div>`;
+      h+=`<li class="water-row"><span class="water-badge">${i+1}</span><span class="water-name">${name}</span></li>`;
     });
-    h+='</div></div>';
+    h+='</ul></article>';
   }
 
-  h+='</div>';
+  h+='</section>';
   document.getElementById('resultsArea').innerHTML=h;
 }
 </script>
