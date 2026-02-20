@@ -11,21 +11,21 @@
   gtag('config', 'G-HEVREKCMG6');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Veekaitsevööndi kalkulaator | Põllumassiivi ja veekaitsevööndi kattuvuse arvutaja</title>
-<meta name="description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. Kasuta PRIA registri andmeid ja Keskkonnaameti veekaitsevööndeid, et leida piirangualad ja puhvertsoonid.">
-<meta name="keywords" content="veekaitsevöönd, kalkulaator, põllumassiiv, PRIA, Keskkonnaamet, veekaitsevööndi arvutaja, põllumajandus, veekaitse, puhverala, kattuvus, Eesti, maaregister">
+<title>Põllu Piirangute Kalkulaator</title>
+<meta name="description" content="Põllumassiivi taimekaitse piirangute kalkulaator. Arvutab veekaitsevööndi, mittepõllumajandusliku maa ja elanike puhvervööndid vastavalt SPe3 nõuetele.">
+<meta name="keywords" content="põllu piirangud, kalkulaator, põllumassiiv, PRIA, Keskkonnaamet, SPe3, taimekaitse, veekaitsevöönd, puhverala, mittepõllumajandusmaa, Eesti, maaregister">
 <meta name="author" content="Rain Villemson">
 <meta name="theme-color" content="#ffffff">
 <link rel="canonical" href="https://veekaitse-arvutaja.vercel.app/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Veekaitsevööndi kalkulaator">
-<meta property="og:description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. PRIA ja Keskkonnaameti andmed.">
+<meta property="og:title" content="Põllu Piirangute Kalkulaator">
+<meta property="og:description" content="Põllumassiivi taimekaitse piirangute kalkulaator. Arvutab veekaitsevööndi, mittepõllumajandusliku maa ja elanike puhvervööndid vastavalt SPe3 nõuetele.">
 <meta property="og:url" content="https://veekaitse-arvutaja.vercel.app/">
 <meta property="og:locale" content="et_EE">
-<meta property="og:site_name" content="Veekaitsevööndi kalkulaator">
+<meta property="og:site_name" content="Põllu Piirangute Kalkulaator">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Veekaitsevööndi kalkulaator">
-<meta name="twitter:description" content="Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil.">
+<meta name="twitter:title" content="Põllu Piirangute Kalkulaator">
+<meta name="twitter:description" content="Põllumassiivi taimekaitse piirangute kalkulaator. SPe3 veekaitsevööndi, mittepõllumajandusliku maa ja elanike puhvervööndid.">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
@@ -37,7 +37,7 @@
   /* Backgrounds */
   --bg-base:#ffffff;--bg-surface:#f4f6f8;--bg-elevated:#ffffff;
   /* Mobile sheet */
-  --sheet-peek:260px;
+  --sheet-peek:380px;
   /* Text */
   --text-primary:#1a1a2e;--text-secondary:#5a6578;--text-muted:#94a3b8;
   /* Accents */
@@ -123,6 +123,9 @@ input:focus::placeholder{opacity:.4}
 .result-card:nth-child(3){animation-delay:120ms}
 .result-card:nth-child(4){animation-delay:180ms}
 .result-card:nth-child(5){animation-delay:240ms}
+.result-card:nth-child(6){animation-delay:300ms}
+.result-card:nth-child(7){animation-delay:360ms}
+.result-card:nth-child(8){animation-delay:420ms}
 .result-card:hover{border-color:var(--border-focus);transform:translateY(-2px);box-shadow:var(--shadow-md)}
 
 .result-header{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-2)}
@@ -214,8 +217,8 @@ input:focus::placeholder{opacity:.4}
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "Veekaitsevööndi kalkulaator",
-  "description": "Arvuta põllumassiivi ja veekaitsevööndite kattuvus interaktiivsel kaardil. Kasuta PRIA registri andmeid ja Keskkonnaameti veekaitsevööndeid.",
+  "name": "Põllu Piirangute Kalkulaator",
+  "description": "Põllumassiivi taimekaitse piirangute kalkulaator. Arvutab veekaitsevööndi, mittepõllumajandusliku maa ja elanike puhvervööndid vastavalt SPe3 nõuetele.",
   "url": "https://veekaitse-arvutaja.vercel.app/",
   "inLanguage": "et",
   "applicationCategory": "UtilitiesApplication",
@@ -241,11 +244,11 @@ input:focus::placeholder{opacity:.4}
     </div>
     <header>
       <p class="logo">PRIA × Keskkonnaamet</p>
-      <h1>Veekaitsevööndi kalkulaator</h1>
-      <p class="subtitle">Leia põllumassiivi ja veekaitsevööndite kattuvus ning arvuta puhverala pindala.</p>
+      <h1>Põllu Piirangute Kalkulaator</h1>
+      <p class="subtitle">Arvuta põllumassiivi taimekaitse piirangualad — veekaitsevööndid, mittepõllumajandusliku maa puhvrid ja muud SPe3 nõuded.</p>
     </header>
 
-    <form id="searchForm" onsubmit="event.preventDefault();search()">
+    <form id="searchForm" onsubmit="event.preventDefault();doSearch()">
       <div class="input-group">
         <label for="fieldNumber">Põllumassiivi number</label>
         <div class="input-wrapper">
@@ -256,12 +259,30 @@ input:focus::placeholder{opacity:.4}
       </div>
 
       <div class="input-group">
-        <label for="bufferDistance">Puhvervahemaa (meetrites)</label>
+        <label for="bufferWater">Veekogu puhver (m)</label>
         <div class="input-wrapper">
-          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
-          <input type="number" id="bufferDistance" value="1" min="0" step="0.5" aria-describedby="bufferHint"/>
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg></span>
+          <input type="number" id="bufferWater" value="10" min="0" step="0.5" aria-describedby="bufferWaterHint"/>
         </div>
-        <p class="info-note" id="bufferHint">Kui palju meetreid peab veekaitsealast eemale jääma</p>
+        <p class="info-note" id="bufferWaterHint">Kaugus veekaitsevööndist (SPe3 veeorganismid)</p>
+      </div>
+
+      <div class="input-group">
+        <label for="bufferEdge">Põlluserva puhver (m)</label>
+        <div class="input-wrapper">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 3v18"/></svg></span>
+          <input type="number" id="bufferEdge" value="5" min="0" step="0.5" aria-describedby="bufferEdgeHint"/>
+        </div>
+        <p class="info-note" id="bufferEdgeHint">SPe3 mittesihtmärktaimed — kaugus mittepõllumajanduslikust maast (mets, tee, kraav). Ei rakendu seal kus kõrval on teine põld.</p>
+      </div>
+
+      <div class="input-group">
+        <label for="bufferResidential">Elanike puhver (m)</label>
+        <div class="input-wrapper">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg></span>
+          <input type="number" id="bufferResidential" value="0" min="0" step="0.5" aria-describedby="bufferResidentialHint"/>
+        </div>
+        <p class="info-note" id="bufferResidentialHint">Kaugus elamurajoonidest ja avalikest kohtadest (SPe3 kõrvalised isikud). Jäta 0 kui ei kohaldu.</p>
       </div>
 
       <button class="btn btn-primary" type="submit" id="searchBtn">
@@ -271,7 +292,7 @@ input:focus::placeholder{opacity:.4}
     </form>
 
     <div style="text-align:center;margin-top:var(--sp-3)">
-      <a href="#" id="demoLink" style="font-size:12px;color:var(--text-muted);text-decoration:none;border-bottom:1px dashed var(--text-muted);transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'" onclick="event.preventDefault();document.getElementById('fieldNumber').value='67350880620';search()">Proovi näitega (67350880620)</a>
+      <a href="#" id="demoLink" style="font-size:12px;color:var(--text-muted);text-decoration:none;border-bottom:1px dashed var(--text-muted);transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'" onclick="event.preventDefault();document.getElementById('fieldNumber').value='67350880620';doSearch()">Proovi näitega (67350880620)</a>
     </div>
     <div id="statusArea" role="status" aria-live="polite" style="margin-top:var(--sp-4)"></div>
     <div id="resultsArea"></div>
@@ -279,10 +300,13 @@ input:focus::placeholder{opacity:.4}
     <section class="legend" id="legendArea" aria-label="Kaardi selgitus" style="display:none">
       <hr class="divider">
       <h2 class="legend-title">Selgitus</h2>
-      <div class="legend-item"><span class="legend-swatch" style="background:rgba(34,197,94,.2);border-color:#16a34a"></span>Põllumassiiv</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:rgba(59,130,246,.15);border-color:#2563eb"></span>Veekaitsevöönd</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:rgba(245,158,11,.15);border-color:#d97706"></span>Puhverala (veekaitsevöönd + puhver)</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:rgba(239,68,68,.2);border-color:#dc2626"></span>Vähendatav ala</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(34,197,94,.18);border-color:#1b8a5a"></span>Põllumassiiv</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(134,239,172,.1);border-color:#86efac"></span>Naabermassivid (puhvrit ei rakendata)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(156,163,175,.12);border-color:#9ca3af"></span>Mittepõllumajanduslik maa</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(59,130,246,.15);border-color:#2563a8"></span>Veekaitsevöönd</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(196,62,62,.3);border-color:#c43e3e"></span>Veekaitse kattuvus</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(124,58,237,.25);border-color:#7c3aed"></span>Põlluserva puhver (mittepm maa)</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:rgba(234,88,12,.25);border-color:#ea580c"></span>Elanike puhver</div>
     </section>
   </aside>
   <div id="map"></div>
@@ -414,7 +438,10 @@ const cardIcons={
   area:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>',
   danger:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
   usable:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg>',
-  water:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>'
+  water:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>',
+  nonAgri:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>',
+  building:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+  total:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>'
 };
 
 /* ───── Estonian number formatting ───── */
@@ -425,11 +452,22 @@ function fmtNum(n,dec=4){
 }
 function fmtInt(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
 
-async function search(){
+/* ───── Helper: safe union of feature array ───── */
+function safeUnion(features){
+  if(!features.length)return null;
+  let merged=features[0];
+  for(let i=1;i<features.length;i++){try{merged=turf.union(merged,features[i])}catch(e){}}
+  return merged;
+}
+
+async function doSearch(){
   const num=document.getElementById('fieldNumber').value.trim();
-  const buf=parseFloat(document.getElementById('bufferDistance').value)||0;
+  const bufWater=parseFloat(document.getElementById('bufferWater').value)||0;
+  const bufEdge=parseFloat(document.getElementById('bufferEdge').value)||0;
+  const bufResidential=parseFloat(document.getElementById('bufferResidential').value)||0;
   if(!num){setStatus('Palun sisesta põllumassiivi number','error');return}
 
+  const btnHtml='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Otsi ja arvuta';
   const btn=document.getElementById('searchBtn');
   btn.disabled=true;
   btn.innerHTML='<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Otsin...';
@@ -448,77 +486,186 @@ async function search(){
     if(!fd.features||!fd.features.length)throw new Error(`Massiivi ${num} ei leitud PRIA registrist`);
 
     const ff=fd.features[0],fp=ff.properties,fw=toWGS(ff);
-    const fl=L.geoJSON(fw,{style:{color:'#16a34a',fillColor:'#22c55e',fillOpacity:.2,weight:2.5}})
+    const fl=L.geoJSON(fw,{style:{color:'#1b8a5a',fillColor:'#22c55e',fillOpacity:.18,weight:2.5}})
       .bindPopup(`<b>Massiiv ${num}</b><br>Pindala: ${fp.pindala?(fp.pindala/10000).toFixed(2)+' ha':'teadmata'}`);
     layers.addLayer(fl);
     map.fitBounds(fl.getBounds(),{padding:[60,60]});
 
-    // 2. Veekaitsevööndid
-    setStatus('Otsin veekaitsevööndeid...','loading');
     const bbox=getBBox(ff);
+    let waterOverlapFeature=null,edgeStripFeature=null;
+    let waterOverlapArea=0,edgeOverlapArea=0;
+    let waterZonesWGS=[];
+    let bufferedWaterZone=null;
+
+    // ──── A) Veekogu puhver ────
+    setStatus('Otsin veekaitsevööndeid...','loading');
     const wr=await fetch(`/api/water-zones?bbox=${bbox.join(',')}`);
     const wd=await wr.json();
     if(wd.error)throw new Error(wd.error);
     const wz=wd.features||[];
+    waterZonesWGS=wz.map(toWGS);
 
-    if(!wz.length){
-      setStatus('Veekaitsevööndeid selle massiivi läheduses ei leitud.','success');
-      showResults(fw,fp,[],0,buf);
-      btn.disabled=false;
-      btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Otsi ja arvuta';
-      document.getElementById('legendArea').style.display='block';
-      if(isMobile())openSheet();
-      return;
-    }
+    if(waterZonesWGS.length){
+      setStatus(`Leitud ${waterZonesWGS.length} veekaitsevööndit. Arvutan...`,'loading');
+      waterZonesWGS.forEach(w=>{
+        const n=w.properties.objekti_nimetus||w.properties.voondi_nimetus||w.properties.nimi||'Veekaitsevöönd';
+        layers.addLayer(L.geoJSON(w,{style:{color:'#2563a8',fillColor:'#3b82f6',fillOpacity:.15,weight:1.5,dashArray:'4 4'}}).bindPopup(`<b>${n}</b>`));
+      });
 
-    setStatus(`Leitud ${wz.length} veekaitsevööndit. Arvutan...`,'loading');
-    const ww=wz.map(toWGS);
-
-    // Joonista veekaitsevööndid
-    ww.forEach(w=>{
-      const n=w.properties.objekti_nimetus||w.properties.voondi_nimetus||w.properties.nimi||'Veekaitsevöönd';
-      layers.addLayer(L.geoJSON(w,{style:{color:'#2563eb',fillColor:'#3b82f6',fillOpacity:.15,weight:1.5,dashArray:'4 4'}}).bindPopup(`<b>${n}</b>`));
-    });
-
-    // 3. Ühenda ja puhverda
-    let merged=ww[0];
-    for(let i=1;i<ww.length;i++){try{merged=turf.union(merged,ww[i])}catch(e){}}
-
-    let buffered=merged;
-    if(buf>0){
-      try{
-        buffered=turf.buffer(merged,buf/1000,{units:'kilometers'});
-        layers.addLayer(L.geoJSON(buffered,{style:{color:'#d97706',fillColor:'#f59e0b',fillOpacity:.12,weight:1.5,dashArray:'6 3'}}).bindPopup(`Puhverala (+${buf}m)`));
-      }catch(e){}
-    }
-
-    // 4. Kattuvus
-    let overlapArea=0;
-    try{
-      const ov=turf.intersect(fw,buffered);
-      if(ov){
-        overlapArea=calcArea(ov);
-        layers.addLayer(L.geoJSON(ov,{style:{color:'#dc2626',fillColor:'#ef4444',fillOpacity:.3,weight:2.5}}).bindPopup(`<b>Vähendatav ala</b><br>${fmtNum(overlapArea/10000)} ha`));
-      }
-    }catch(e){
-      for(const w of ww){
+      let merged=safeUnion(waterZonesWGS);
+      bufferedWaterZone=merged;
+      if(bufWater>0&&merged){
         try{
-          const z=buf>0?turf.buffer(w,buf/1000,{units:'kilometers'}):w;
-          const i=turf.intersect(fw,z);
-          if(i){overlapArea+=calcArea(i);layers.addLayer(L.geoJSON(i,{style:{color:'#dc2626',fillColor:'#ef4444',fillOpacity:.3,weight:2.5}}))}
-        }catch(e2){}
+          bufferedWaterZone=turf.buffer(merged,bufWater/1000,{units:'kilometers'});
+          // Joonista puhvri riba
+          let bufferRing=null;
+          try{bufferRing=turf.difference(bufferedWaterZone,merged)}catch(e){}
+          if(bufferRing){
+            layers.addLayer(L.geoJSON(bufferRing,{style:{color:'#2563a8',fillColor:'#3b82f6',fillOpacity:.1,weight:1,dashArray:'6 3'}}));
+          }
+        }catch(e){}
+      }
+
+      try{
+        waterOverlapFeature=turf.intersect(fw,bufferedWaterZone);
+        if(waterOverlapFeature){
+          waterOverlapArea=calcArea(waterOverlapFeature);
+          layers.addLayer(L.geoJSON(waterOverlapFeature,{style:{color:'#c43e3e',fillColor:'#c43e3e',fillOpacity:.3,weight:2}}).bindPopup(`<b>Veekaitse kattuvus</b><br>${fmtNum(waterOverlapArea/10000)} ha`));
+        }
+      }catch(e){
+        for(const w of waterZonesWGS){
+          try{
+            const z=bufWater>0?turf.buffer(w,bufWater/1000,{units:'kilometers'}):w;
+            const ix=turf.intersect(fw,z);
+            if(ix){waterOverlapArea+=calcArea(ix);if(!waterOverlapFeature)waterOverlapFeature=ix;else try{waterOverlapFeature=turf.union(waterOverlapFeature,ix)}catch(e2){}}
+          }catch(e2){}
+        }
+        if(waterOverlapFeature)layers.addLayer(L.geoJSON(waterOverlapFeature,{style:{color:'#c43e3e',fillColor:'#c43e3e',fillOpacity:.3,weight:2}}));
       }
     }
 
-    setStatus(overlapArea>0
-      ?`Kattuvus leitud! Vähendatav ala: ${(overlapArea/10000).toFixed(4)} ha`
-      :'Veekaitsevööndid ei kattu selle põllumassiiviga.',
-      overlapArea>0?'warning':'success');
+    // ──── B) Põlluserva puhver ────
+    let neighborCount=0;
+    if(bufEdge>0){
+      setStatus('Otsin naabermassivide...','loading');
 
-    showResults(fw,fp,ww,overlapArea,buf);
+      const edgeExt=Math.max(bufEdge+500,1000);
+      const edgeBbox3301=[bbox[0]-edgeExt,bbox[1]-edgeExt,bbox[2]+edgeExt,bbox[3]+edgeExt];
+
+      const nfResp=await fetch(`/api/nearby-fields?bbox=${edgeBbox3301.join(',')}`);
+      const nfData=await nfResp.json();
+      const allRawFeatures=nfData.features||[];
+      const allFieldFeatures=allRawFeatures.map(toWGS);
+
+      function getFieldId(feature){
+        const p=feature.properties||{};
+        return p.massiivi_id||p.MASSIIVI_ID||p.massiiv_id||p.MASSIIV_ID||p.xy_id||p.XY_ID||p.id||p.ID||'';
+      }
+      const targetId=String(getFieldId(ff));
+
+      let allAgriLand=null;
+      for(let i=0;i<allFieldFeatures.length;i++){
+        try{
+          allAgriLand=allAgriLand?turf.union(allAgriLand,allFieldFeatures[i]):allFieldFeatures[i];
+        }catch(e){}
+      }
+
+      if(allAgriLand){
+        const fieldBounds=turf.bbox(fw);
+        const expandDeg=0.015;
+        const bboxPoly=turf.bboxPolygon([
+          fieldBounds[0]-expandDeg,
+          fieldBounds[1]-expandDeg*0.6,
+          fieldBounds[2]+expandDeg,
+          fieldBounds[3]+expandDeg*0.6
+        ]);
+
+        let nonAgriLand=null;
+        try{nonAgriLand=turf.difference(bboxPoly,allAgriLand)}catch(e){}
+
+        if(nonAgriLand){
+          let nonAgriBuf=null;
+          try{nonAgriBuf=turf.buffer(nonAgriLand,bufEdge/1000,{units:'kilometers'})}catch(e){}
+
+          if(nonAgriBuf){
+            let edgeOverlap=null;
+            try{edgeOverlap=turf.intersect(fw,nonAgriBuf)}catch(e){}
+
+            if(edgeOverlap){
+              // Morfoloogiline sulgemine: eemalda kitsad vahed (<6m) massiivide vahel
+              try{
+                const eroded=turf.buffer(nonAgriLand,-0.003,{units:'kilometers'});
+                if(eroded){
+                  const dilated=turf.buffer(eroded,(bufEdge+3)/1000,{units:'kilometers'});
+                  const cleanOverlap=turf.intersect(fw,dilated);
+                  if(cleanOverlap)edgeOverlap=cleanOverlap;
+                }
+              }catch(e){}
+
+              // Eemalda veekaitsevööndi kattuvus
+              if(bufferedWaterZone){
+                try{edgeOverlap=turf.difference(edgeOverlap,bufferedWaterZone)}catch(e){}
+              }
+
+              // Puhasta MultiPolygon killud
+              if(edgeOverlap&&edgeOverlap.geometry.type==='MultiPolygon'){
+                const valid=edgeOverlap.geometry.coordinates.filter(p=>{
+                  try{return p[0]&&p[0].length>=4&&turf.area(turf.polygon(p))>1}catch(e){return false}
+                });
+                if(valid.length===0)edgeOverlap=null;
+                else if(valid.length===1)edgeOverlap=turf.polygon(valid[0]);
+                else edgeOverlap=turf.multiPolygon(valid);
+              }
+
+              if(edgeOverlap){
+                edgeOverlapArea=calcArea(edgeOverlap);
+                if(edgeOverlapArea<1)edgeOverlapArea=turf.area(edgeOverlap);
+
+                if(edgeOverlapArea>1){
+                  edgeStripFeature=edgeOverlap;
+                  layers.addLayer(L.geoJSON(edgeOverlap,{
+                    style:{color:'#7c3aed',fillColor:'#7c3aed',fillOpacity:.25,weight:2,opacity:.8}
+                  }).bindPopup(`<b>Põlluserva puhver (${bufEdge}m)</b><br>${fmtNum(edgeOverlapArea/10000)} ha<br>Mittepõllumajanduslikust maast`));
+                }
+              }
+            }
+          }
+        }
+
+        // Naabermassivid kaardil
+        const neighbors=allFieldFeatures.filter(f=>String(getFieldId(f))!==targetId&&String(getFieldId(f))!=='');
+        neighborCount=neighbors.length;
+        if(neighbors.length>0){
+          let nUnion=neighbors[0];
+          for(let i=1;i<neighbors.length;i++){try{nUnion=turf.union(nUnion,neighbors[i])}catch(e){}}
+          layers.addLayer(L.geoJSON(nUnion,{
+            style:{color:'#86efac',fillColor:'#86efac',fillOpacity:.05,weight:1,opacity:.3,dashArray:'3 3'}
+          }).bindPopup(`Naabermassivid (${neighbors.length} tk)`));
+        }
+      }
+    }
+
+    // ──── C) Elanike puhver (informatiivne) ────
+    let residentialNote='';
+    if(bufResidential>0){
+      residentialNote=`Elanike puhver ${bufResidential}m on seatud. Hoonete automaatne tuvastamine pole veel toetatud — kontrolli kohapeal kas massiivi läheduses on elamuid.`;
+    }
+
+    // ──── D) Koondtulemus ────
+    setStatus('Arvutan koondtulemust...','loading');
+    let allRestricted=null;
+    if(waterOverlapFeature)allRestricted=waterOverlapFeature;
+    if(edgeStripFeature){allRestricted=allRestricted?turf.union(allRestricted,edgeStripFeature):edgeStripFeature}
+    const totalRestrictedArea=allRestricted?calcArea(allRestricted):0;
+
+    setStatus(totalRestrictedArea>0
+      ?`Vähendatav ala kokku: ${fmtNum(totalRestrictedArea/10000)} ha`
+      :'Piirangualasid ei leitud.',
+      totalRestrictedArea>0?'warning':'success');
+
+    showResults(fw,fp,waterZonesWGS,waterOverlapArea,edgeOverlapArea,totalRestrictedArea,bufWater,bufEdge,bufResidential,neighborCount,residentialNote);
     document.getElementById('legendArea').style.display='block';
 
-    // Auto-open sheet on mobile when results arrive
     if(isMobile())openSheet();
 
   }catch(err){
@@ -526,30 +673,45 @@ async function search(){
     setStatus(err.message||'Viga andmete laadimisel','error');
   }
   btn.disabled=false;
-  btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Otsi ja arvuta';
+  btn.innerHTML=btnHtml;
 }
 
-function showResults(field,props,waterZones,overlapArea,bufferDist){
-  const fa=calcArea(field),fh=fmtNum(fa/10000),oh=fmtNum(overlapArea/10000);
-  const eh=fmtNum((fa-overlapArea)/10000),op=fa>0?((overlapArea/fa)*100).toFixed(1).replace('.',','):0;
+function showResults(field,props,waterZones,waterArea,edgeArea,totalArea,bufWater,bufEdge,bufResidential,neighborCount,residentialNote){
+  const fa=calcArea(field),fh=fmtNum(fa/10000);
+  const th=fmtNum(totalArea/10000);
+  const uh=fmtNum((fa-totalArea)/10000);
+  const tp=fa>0?((totalArea/fa)*100).toFixed(1).replace('.',','):'0';
 
   let h='<hr class="divider"><section class="results" aria-label="Tulemused">';
 
-  // Põllumassiiv card
   h+=`<article class="result-card"><header class="result-header">${cardIcons.field}<h3>Põllumassiiv</h3></header><p class="result-value">${props.xy_id||'N/A'}</p><p class="result-sub">${[props.maakond,props.vald].filter(Boolean).join(', ')}</p></article>`;
 
-  // Pindala card
   h+=`<article class="result-card"><header class="result-header">${cardIcons.area}<h3>Massiivi pindala</h3></header><p class="result-value">${fh}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(fa)} m²</p></article>`;
 
-  // Vähendatav ala card
-  h+=`<article class="result-card ${overlapArea>0?'result-highlight':''}"><header class="result-header">${cardIcons.danger}<h3>Vähendatav ala ${bufferDist>0?`(+${bufferDist}m puhver)`:'(ilma puhvrita)'}</h3></header><p class="result-value">${oh}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(overlapArea)} m² · <span class="result-badge ${overlapArea>0?'result-badge-danger':'result-badge-success'}">${op}%</span> massiivi pindalast</p></article>`;
-
-  // Kasutatav pindala card
-  if(overlapArea>0){
-    h+=`<article class="result-card result-positive"><header class="result-header">${cardIcons.usable}<h3>Kasutatav pindala</h3></header><p class="result-value">${eh}<span class="unit">ha</span></p><p class="result-sub">Massiivi pindala miinus vähendatav ala</p></article>`;
+  if(waterArea>0){
+    h+=`<article class="result-card result-highlight"><header class="result-header">${cardIcons.water}<h3>Veekaitse puhver (${bufWater}m)</h3></header><p class="result-value" style="color:#c43e3e">${fmtNum(waterArea/10000)}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(waterArea)} m²</p></article>`;
+  }else if(bufWater>0){
+    h+=`<article class="result-card"><header class="result-header">${cardIcons.water}<h3>Veekaitse puhver (${bufWater}m)</h3></header><p class="result-value">0<span class="unit">ha</span></p><p class="result-sub">Veekaitsevööndeid ei leitud</p></article>`;
   }
 
-  // Veekaitsevööndid card
+  if(bufEdge>0){
+    if(edgeArea>0){
+      h+=`<article class="result-card" style="border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.03)"><header class="result-header">${cardIcons.nonAgri}<h3>Põlluserva puhver (${bufEdge}m)</h3></header><p class="result-value" style="color:#7c3aed">${fmtNum(edgeArea/10000)}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(edgeArea)} m² · Arvestatud ${neighborCount} naabermassiviga. Servades kus kõrval on teine põld, puhvrit ei rakendata.</p></article>`;
+    }else{
+      h+=`<article class="result-card"><header class="result-header">${cardIcons.nonAgri}<h3>Põlluserva puhver (${bufEdge}m)</h3></header><p class="result-value">0<span class="unit">ha</span></p><p class="result-sub">Kogu massiivi serv piirneb teiste põldudega</p></article>`;
+    }
+  }
+
+  if(bufResidential>0){
+    h+=`<article class="result-card" style="border-color:rgba(234,88,12,.3);background:rgba(234,88,12,.03)"><header class="result-header">${cardIcons.building}<h3>Elanike puhver (${bufResidential}m)</h3></header><p class="result-value" style="color:#ea580c">—</p><p class="result-sub">${residentialNote}</p></article>`;
+  }
+
+  h+=`<article class="result-card ${totalArea>0?'result-highlight':''}"><header class="result-header">${cardIcons.total}<h3>Kokku vähendatav</h3></header><p class="result-value">${th}<span class="unit">ha</span></p><p class="result-sub">${fmtInt(totalArea)} m² · <span class="result-badge ${totalArea>0?'result-badge-danger':'result-badge-success'}">${tp}%</span> massiivi pindalast</p></article>`;
+
+  if(totalArea>0){
+    h+=`<article class="result-card result-positive"><header class="result-header">${cardIcons.usable}<h3>Kasutatav pindala</h3></header><p class="result-value">${uh}<span class="unit">ha</span></p><p class="result-sub">Massiivi pindala miinus kogu vähendatav ala</p></article>`;
+  }
+
   if(waterZones.length){
     h+=`<article class="result-card"><header class="result-header">${cardIcons.water}<h3>Leitud veekaitsevööndid</h3><span class="result-badge result-badge-success">${waterZones.length}</span></header><ul class="water-details">`;
     waterZones.forEach((w,i)=>{
